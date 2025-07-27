@@ -3,15 +3,7 @@
 // Add, remove, or change passwords in this list and both files will update automatically
 
 export const PASSWORDS = [
-    'mypassword123',
-    'secret456', 
-    'access789',
-    'unlock2024',
-    'key555',
-    'script999',
-    'auth777',
-    'pass111',
-    'code444',
+    'araby55',
     'magic888'
 ];
 
