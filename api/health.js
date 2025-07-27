@@ -1,4 +1,3 @@
-// api/health.js
 export default function handler(req, res) {
     // Handle CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -9,23 +8,10 @@ export default function handler(req, res) {
         return res.status(200).end();
     }
     
-    if (req.method !== 'GET') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-    
-    const healthData = {
-        status: '✅ Server is online and working!',
+    return res.status(200).json({
+        status: 'Server is working!',
         timestamp: new Date().toISOString(),
-        message: 'Your password authentication server is running perfectly',
-        server: 'Vercel Serverless Functions',
-        uptime: 'Serverless (always available)',
-        version: '1.0.0'
-    };
-    
-    console.log('📊 Health check requested:', {
-        timestamp: healthData.timestamp,
-        status: 'healthy'
+        message: 'Your password server is online',
+        url: 'https://password-auth-server-ms3n.vercel.app'
     });
-    
-    return res.status(200).json(healthData);
 }
