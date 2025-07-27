@@ -1,4 +1,4 @@
-// List of valid passwords
+// List of valid passwords  
 const passwords = [
     'mypassword123',
     'secret456', 
@@ -12,9 +12,14 @@ const passwords = [
     'magic888'
 ];
 
-// Track used passwords (in memory - resets when server restarts)
-// For permanent storage, you'd need a database
-let usedPasswords = new Set();
+// Create a simple hash function to track device+password combinations
+function createDevicePasswordHash(password, userAgent, ip) {
+    const deviceInfo = (ip || 'unknown') + '_' + (userAgent || 'unknown');
+    return Buffer.from(password + '_' + deviceInfo).toString('base64');
+}
+
+// In-memory storage (will reset on server restart - that's actually good for security)
+let usedDevicePasswordCombinations = new Set();
 
 export default function handler(req, res) {
     // Handle CORS
@@ -42,13 +47,11 @@ export default function handler(req, res) {
         });
     }
     
-    // Log the attempt
-    console.log('🔐 Authentication attempt:', {
-        password: password ? '***' : 'empty',
-        domain: domain || 'unknown',
-        timestamp: timestamp ? new Date(timestamp).toISOString() : new Date().toISOString(),
-        userAgent: userAgent ? userAgent.substring(0, 50) + '...' : 'unknown'
-    });
+    // Get client IP
+    const clientIP = req.headers['x-forwarded-for'] || 
+                    req.headers['x-real-ip'] || 
+                    req.connection?.remoteAddress || 
+                    'unknown';
     
     // Check if password exists in our list
     if (!passwords.includes(password)) {
@@ -59,27 +62,30 @@ export default function handler(req, res) {
         });
     }
     
-    // Check if password has already been used
-    if (usedPasswords.has(password)) {
-        console.log('🚫 Password already used:', password);
+    // Create unique hash for this device+password combination
+    const devicePasswordHash = createDevicePasswordHash(password, userAgent, clientIP);
+    
+    // Check if this specific device has already used this password
+    if (usedDevicePasswordCombinations.has(devicePasswordHash)) {
+        console.log('🚫 Password already used by this device:', password);
         return res.status(403).json({
             success: false,
-            message: 'This password has already been used and is no longer valid'
+            message: 'This password has already been used on this device'
         });
     }
     
-    // Password is valid and not used - mark it as used
-    usedPasswords.add(password);
+    // Mark this device+password combination as used
+    usedDevicePasswordCombinations.add(devicePasswordHash);
     
     console.log('✅ Authentication successful!');
-    console.log('Password used and disabled:', password);
-    console.log('Remaining passwords:', passwords.length - usedPasswords.size);
-    console.log('Used passwords so far:', Array.from(usedPasswords));
+    console.log('Password used:', password);
+    console.log('Device hash:', devicePasswordHash.substring(0, 10) + '...');
+    console.log('Total device+password combinations used:', usedDevicePasswordCombinations.size);
     
     return res.status(200).json({
         success: true,
         message: 'Authentication successful',
         timestamp: Date.now(),
-        remainingPasswords: passwords.length - usedPasswords.size
+        note: 'Password can still be used on other devices'
     });
 }
