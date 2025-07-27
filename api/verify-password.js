@@ -1,11 +1,5 @@
-// List of valid passwords
-const passwords = [
-    'ARABY55',
-    'magic888'
-];
-
-// Track used passwords globally (resets when server restarts)
-let globalUsedPasswords = new Set();
+// Import shared password configuration
+import { getAllPasswords, isPasswordUsed, markPasswordAsUsed, getPasswordStats } from '../config/passwords.js';
 
 export default function handler(req, res) {
     // Handle CORS
@@ -40,9 +34,12 @@ export default function handler(req, res) {
         });
     }
     
-    // Check if password exists in our original list
-    if (!passwords.includes(password)) {
-        console.log('❌ Password not in list:', password);
+    // Get passwords from shared config
+    const validPasswords = getAllPasswords();
+    
+    // Check if password exists in our master list
+    if (!validPasswords.includes(password)) {
+        console.log('❌ Password not in master list:', password);
         return res.status(401).json({
             success: false,
             message: 'Invalid password'
@@ -50,9 +47,10 @@ export default function handler(req, res) {
     }
     
     // Check if this specific password has been used before
-    if (globalUsedPasswords.has(password)) {
-        console.log('🚫 Password already used globally:', password);
-        console.log('Used passwords so far:', Array.from(globalUsedPasswords));
+    if (isPasswordUsed(password)) {
+        const stats = getPasswordStats();
+        console.log('🚫 Password already used:', password);
+        console.log('Used passwords so far:', stats.usedPasswords);
         return res.status(403).json({
             success: false,
             message: 'This password has already been used and is no longer valid'
@@ -60,17 +58,20 @@ export default function handler(req, res) {
     }
     
     // Password is valid and not used - mark it as used
-    globalUsedPasswords.add(password);
+    markPasswordAsUsed(password);
+    const updatedStats = getPasswordStats();
     
     console.log('✅ SUCCESS! Password accepted and disabled:', password);
-    console.log('Passwords used so far:', Array.from(globalUsedPasswords));
-    console.log('Remaining passwords:', passwords.length - globalUsedPasswords.size);
+    console.log('Passwords used so far:', updatedStats.usedPasswords);
+    console.log('Remaining passwords:', updatedStats.available);
     
     return res.status(200).json({
         success: true,
         message: 'Authentication successful',
         timestamp: Date.now(),
         passwordUsed: password,
-        remainingPasswords: passwords.length - globalUsedPasswords.size
+        remainingPasswords: updatedStats.available,
+        totalUsedPasswords: updatedStats.used,
+        usagePercentage: `${updatedStats.usagePercentage}%`
     });
 }
