@@ -2,15 +2,10 @@
   "name": "password-auth-server",
   "version": "1.0.0",
   "description": "Password authentication server for userscripts",
-  "main": "api/verify-password.js",
-  "scripts": {
-    "dev": "vercel dev",
-    "build": "vercel build"
-  },
   "dependencies": {
     "cors": "^2.8.5"
   },
   "engines": {
-    "node": ">=14.x"
+    "node": ">=18.x"
   }
 }
