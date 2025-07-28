@@ -4,7 +4,7 @@
 
 export const PASSWORDS = [
     'araby55',
-    '1234',
+    '0000',
     'magic888'
 ];
 
