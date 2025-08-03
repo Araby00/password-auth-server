@@ -3,7 +3,7 @@ import { getUsedPasswords, addUsedPassword, isPasswordUsed, getStateInfo } from 
 // List of valid passwords
 const passwords = [
     'ARABY1',
-    'ARABY2'
+    'ARABY2',
     'ARABY3'
 ];
 
