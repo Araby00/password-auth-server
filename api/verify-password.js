@@ -4,6 +4,7 @@ import { getUsedPasswords, addUsedPassword, isPasswordUsed, getStateInfo } from 
 const passwords = [
     'ARABY1',
     'ARABY2'
+    'ARABY3'
 ];
 
 export default function handler(req, res) {
