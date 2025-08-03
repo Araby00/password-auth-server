@@ -2,16 +2,8 @@ import { getUsedPasswords, addUsedPassword, isPasswordUsed, getStateInfo } from 
 
 // List of valid passwords
 const passwords = [
-    'mypassword123',
-    'secret456', 
-    'access789',
-    'unlock2024',
-    'key555',
-    'script999',
-    'auth777',
-    'pass111',
-    'code444',
-    'magic888'
+    'ARABY1',
+    'ARABY2'
 ];
 
 export default function handler(req, res) {
