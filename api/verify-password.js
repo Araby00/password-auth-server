@@ -2,10 +2,13 @@ import { getUsedPasswords, addUsedPassword, isPasswordUsed, getStateInfo, addDev
 
 // List of valid passwords - UPDATE THESE TO YOUR ACTUAL PASSWORDS
 const passwords = [
-    'ARABY1',
-    'ARABY2', 
-    'ARABY3',
-    'ARABY4'
+    'AWA1',
+    'AWA2', 
+    'AWA3',
+    'AWA4',
+    'AWA5',
+    'AWA6', 
+    'AWA7'
 ];
 
 export default function handler(req, res) {
