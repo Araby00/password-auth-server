@@ -1,11 +1,11 @@
 {
-  "name": "vfs-trial-server",
+  "name": "password-auth-server",
   "version": "1.0.0",
-  "scripts": {
-    "dev": "vercel dev",
-    "build": "vercel build"
-  },
+  "description": "Password authentication server for userscripts",
   "dependencies": {
     "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }
