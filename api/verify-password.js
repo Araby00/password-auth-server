@@ -1,9 +1,9 @@
-import { getUsedPasswords, addUsedPassword, isPasswordUsed, getStateInfo } from './shared-state.js';
+import { getUsedPasswords, addUsedPassword, isPasswordUsed, getStateInfo, addDeviceAccess, isDeviceUsed } from './shared-state.js';
 
-// List of valid passwords
+// List of valid passwords - UPDATE THESE TO YOUR ACTUAL PASSWORDS
 const passwords = [
     'ARABY1',
-    'ARABY2',
+    'ARABY2', 
     'ARABY3'
 ];
 
@@ -21,10 +21,15 @@ export default function handler(req, res) {
     
     // Allow GET for testing
     if (req.method === 'GET') {
+        const stateInfo = getStateInfo();
         return res.status(200).json({
             status: 'Password verification endpoint is working',
             method: 'POST required for authentication',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            usedPasswordsCount: stateInfo.usedCount,
+            usedDevicesCount: stateInfo.deviceCount,
+            totalPasswords: passwords.length,
+            remainingPasswords: passwords.length - stateInfo.usedCount
         });
     }
     
@@ -36,12 +41,13 @@ export default function handler(req, res) {
     }
     
     try {
-        const { password, timestamp, userAgent, domain } = req.body || {};
+        const { password, deviceId, timestamp, userAgent, domain } = req.body || {};
         
         // Enhanced logging
         console.log('🔐 Authentication attempt:', {
             hasPassword: !!password,
             passwordLength: password ? password.length : 0,
+            deviceId: deviceId || 'unknown',
             domain: domain || 'unknown',
             userAgent: userAgent ? userAgent.substring(0, 50) + '...' : 'unknown',
             timestamp: new Date().toISOString(),
@@ -54,6 +60,15 @@ export default function handler(req, res) {
                 success: false,
                 message: 'Password is required',
                 debug: 'Request body missing password field'
+            });
+        }
+
+        if (!deviceId) {
+            console.log('❌ No device ID provided');
+            return res.status(400).json({
+                success: false,
+                message: 'Device ID is required',
+                debug: 'Request body missing deviceId field'
             });
         }
         
@@ -74,22 +89,38 @@ export default function handler(req, res) {
             return res.status(403).json({
                 success: false,
                 message: 'This password has already been used and is no longer valid',
-                debug: 'Password found in used passwords list'
+                debug: `Password used. Total used: ${stateInfo.usedCount}/${passwords.length}`
+            });
+        }
+
+        // Check if this device has already used any password
+        if (isDeviceUsed(deviceId)) {
+            console.log('🚫 Device already used a password:', deviceId);
+            return res.status(403).json({
+                success: false,
+                message: 'This device has already used a password. Each device can only authenticate once.',
+                debug: 'Device found in used devices list'
             });
         }
         
-        // Password is valid and not used - mark it as used
+        // Password is valid and not used, device is new - mark both as used
         addUsedPassword(password);
+        addDeviceAccess(deviceId, password);
+        
         const stateInfo = getStateInfo();
         
         console.log('✅ SUCCESS! Password accepted:', password);
+        console.log('✅ Device registered:', deviceId);
         console.log('Total used passwords:', stateInfo.usedCount);
+        console.log('Total used devices:', stateInfo.deviceCount);
         
         return res.status(200).json({
             success: true,
-            message: 'Authentication successful',
+            message: 'Authentication successful - Trial period started',
             timestamp: Date.now(),
             passwordUsed: password,
+            deviceId: deviceId,
+            trialDuration: '24 hours',
             remainingPasswords: passwords.length - stateInfo.usedCount
         });
         
