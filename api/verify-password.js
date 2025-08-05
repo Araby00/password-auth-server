@@ -4,7 +4,6 @@ import { getUsedPasswords, addUsedPassword, isPasswordUsed, getStateInfo, addDev
 const passwords = [
     'AWA1',
     'AWA2', 
-    'AWA3',
     'AWA4',
     'AWA0',
     'AWA00', 
