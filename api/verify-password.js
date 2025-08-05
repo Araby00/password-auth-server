@@ -6,9 +6,9 @@ const passwords = [
     'AWA2', 
     'AWA3',
     'AWA4',
-    'AWA5',
-    'AWA6', 
-    'AWA7'
+    'AWA0',
+    'AWA00', 
+    'AWA11'
 ];
 
 export default function handler(req, res) {
