@@ -3,7 +3,7 @@ import { getUsedPasswords, addUsedPassword, isPasswordUsed, getStateInfo, addDev
 // List of valid passwords - UPDATE THESE TO YOUR ACTUAL PASSWORDS
 const passwords = [
     'OOO1',
-    'OOO2', 
+    'SS', 
     'OOO3',
     'KKK4',
     'KKK5', 
