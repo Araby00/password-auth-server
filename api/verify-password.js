@@ -4,7 +4,7 @@ import { getUsedPasswords, addUsedPassword, isPasswordUsed, getStateInfo, addDev
 const passwords = [
     'OOO1',
     'SS', 
-    'OOO3',
+    'MAR',
     'KKK4',
     'KKK5', 
     'KKK6'
